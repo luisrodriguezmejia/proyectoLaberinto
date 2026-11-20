@@ -1,0 +1,72 @@
+import java.util.ArrayList;
+import java.util.List;
+
+//Representación del laberinto como matriz de enteros.
+//celdas[f][c] = 0 (libre) o 1 (pared); costos[f][c] = costo de la celda libre.
+
+public class RepresentacionMatriz implements Laberinto {
+    private static final int[] DF = {-1, 1, 0, 0};
+    private static final int[] DC = {0, 0, -1, 1};
+
+    private final int[][] celdas;
+    private final int[][] costos;
+    private final int costoMinimo;
+
+    public RepresentacionMatriz(int[][] celdas, int[][] costos) {
+        this.celdas = celdas;
+        this.costos = costos;
+        int minimo = Integer.MAX_VALUE;
+        for (int f = 0; f < celdas.length; f++) {
+            for (int c = 0; c < celdas[0].length; c++) {
+                if (celdas[f][c] == LIBRE && costos[f][c] < minimo) {
+                    minimo = costos[f][c];
+                }
+            }
+        }
+        this.costoMinimo = (minimo == Integer.MAX_VALUE) ? 1 : minimo;
+    }
+
+    @Override
+    public int getFilas() {
+        return celdas.length;
+    }
+
+    @Override
+    public int getColumnas() {
+        return celdas[0].length;
+    }
+
+    @Override
+    public boolean esLibre(int fila, int columna) {
+        return fila >= 0 && fila < getFilas() && columna >= 0 && columna < getColumnas()
+                && celdas[fila][columna] == LIBRE;
+    }
+
+    @Override
+    public int getCosto(int fila, int columna) {
+        return esLibre(fila, columna) ? costos[fila][columna] : 0;
+    }
+
+    @Override
+    public List<Celda> getVecinos(Celda celda) {
+        List<Celda> vecinos = new ArrayList<>();
+        for (int k = 0; k < 4; k++) {
+            int nf = celda.getFila() + DF[k];
+            int nc = celda.getColumna() + DC[k];
+            if (esLibre(nf, nc)) {
+                vecinos.add(new Celda(nf, nc));
+            }
+        }
+        return vecinos;
+    }
+
+    @Override
+    public int getCostoMinimo() {
+        return costoMinimo;
+    }
+
+    @Override
+    public String getNombreRepresentacion() {
+        return "Matriz";
+    }
+}
